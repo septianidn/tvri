@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Barang;
-use Dotenv\Validator;
-use Illuminate\Http\Request;
+use Illuminate\Http\Request;use 
+Illuminate\Support\Facades\Validator;
 
 class BarangController extends Controller
 {
@@ -15,7 +15,8 @@ class BarangController extends Controller
      */
     public function index()
     {
-        return view('barang.index');
+        $barang = Barang::all();
+        return view('barang.index', compact('barang'));
     }
 
     /**
@@ -23,9 +24,10 @@ class BarangController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function read()
     {
-        return 'halo';
+        $barang = Barang::all();
+        return view('barang.read', compact('barang'));
     }
 
     /**
@@ -45,15 +47,19 @@ class BarangController extends Controller
             'jumlah' => 'required',
         ]);
 
-        // if($validated->fails()){
-        //     return response()->json([
-        //         'status' => 400,
-        //         'errors' => $validated->messages()
-        //     ]);
-        // }
-        // else{
+        
+        $validator = Validator::make($request->all(), [
+            'nama' => 'required|max:55',
+            'jenis' => 'required|max:55',
+            'merk' => 'required|max:55',
+            'jumlah' => 'required',
+        ]);
 
-        // }
+        if ($validator->fails()){
+           return response()->json(['errors'=>$validator->errors()->all()]);
+        }
+
+       
         
         $data = new Barang();
         $data->nama_barang = $validated['nama'];
@@ -61,6 +67,10 @@ class BarangController extends Controller
         $data->merk = $validated['merk'];
         $data->qty = $validated['jumlah'];
         $data->save();
+
+        return response()->json([
+            'status' => 200
+        ]);
     }
 
     /**

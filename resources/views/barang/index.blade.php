@@ -6,9 +6,17 @@
 @section('content')
 <div class="col-lg-8">
     <button class="btn btn-primary" onclick="" data-bs-toggle="modal" data-bs-target="#exampleModal">+Tambah Data</button>
+    <div id="read" class="mt-3">
+
+    </div>
 </div>
 
 <!-- Button trigger modal -->
+
+
+
+
+<!-- Modal -->
 
 
 <!-- Modal -->
@@ -16,39 +24,53 @@
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h1 class="modal-title fs-5" id="exampleModalLabel">Tambah Data Barang</h1>
-        <button type="button" class="btn btn-danger" data-bs-dismiss="modal" aria-label="Close" id="close">X</button>
+        <h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">X</button>
       </div>
       <div class="modal-body">
-        <div class="form-group">
-          <div class="row mt-3">
-            <label for="nama">Nama Barang</label>
-            <input type="text" name="nama" id="nama" placeholder="Nama barang..." class="form-control @error('nama') is-invalid @enderror">
-            @error('nama')
-                <div class="alert alert-danger">{{ $message }}</div>
-            @enderror
-          </div>
-        </div>
-        <div class="form-group">
-            <div class="row mt-3">
-              <input type="text" name="jenis" id="jenis" placeholder="Jenis barang..." class="form-control">
-            </div>
-        </div>
-        <div class="form-group">
-            <div class="row mt-3">
+         <div class="alert alert-danger" style="display:none"></div> 
 
-              <input type="text" name="merk" id="merk" placeholder="Merk barang..." class="form-control">
-            </div>
-        </div>
-        <div class="form-group">
-          <div class="row mt-3">
+                    <form class="barang-upload" method="post" action="{{ route('barang_store') }}"> 
 
-            <input type="number" name="jumlah" id="jumlah" placeholder="Jumlah barang..." class="form-control">
-          </div>
-        </div>
+                        @csrf 
+
+                        <div class="form-group"> 
+
+                            <label>Nama Barang</label> 
+
+                            <input type="text" name="nama" id="nama" class="form-control"/> 
+
+                        </div>   
+
+                        <div class="form-group"> 
+
+                            <label>Jenis Barang</label> 
+
+                            <input type="text" name="jenis" id="jenis" class="form-control"/> 
+
+                        </div> 
+
+                        <div class="form-group"> 
+
+                            <label>Merk Barang</label> 
+
+                            <input type="text" name="merk" id="merk" class="form-control"/> 
+
+                        </div> 
+
+                        <div class="form-group"> 
+
+                            <label>Jumlah Barang</label> 
+
+                            <input type="text" name="jumlah" id="jumlah" class="form-control"/> 
+
+                        </div> 
+
+                    </form> 
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-primary" onclick="" id="brg_tambah">Tambah Data</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="closeForm">Close</button>
+        <button type="button" class="btn btn-primary" id="formSubmit">Save changes</button>
       </div>
     </div>
   </div>
@@ -58,40 +80,89 @@
 
 @section('script')
 <script>
-  $(document).ready(function(){
+  $(document).ready(function(){ 
+    
+    $("#tabel").DataTable();
 
-    function read(){
+    readData();
 
+    function readData(){
+      $.get("{{route('read')}}", {}, function (data, status) {
+          $('#read').html(data);
+        }
+      );
     }
 
-    
-});
-$(document).on('click','#brg_tambah' , function (e) {
-      e.preventDefault();
-      var data = {
-        'nama' : $('#nama').val(),
-        'jenis' : $('#jenis').val(),
-        'merk' : $('#merk').val(),
-        'jumlah' : $('#jumlah').val(),
-      }
-      $.ajaxSetup({
-          headers: {
-              'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-          }
-      });
-      $.ajax({
-        type: "POST",
-        url: "{{route('barang_store')}}",
-        data: data,
-        success: function (response) {
-          console.log(response);
-          // $("#exampleModal").modal("hide");
-          //$("#close").click();
+            $('#formSubmit').click(function(e){ 
 
-          //
-        }
-      });
-    });
+                e.preventDefault(); 
+
+                $.ajaxSetup({ 
+
+                    headers: {
+                  'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+              }
+
+                }); 
+
+                $.ajax({ 
+
+                    url: "{{ route('barang_store') }}", 
+
+                    method: 'post', 
+
+                    data: { 
+
+                        nama: $('#nama').val(), 
+                        jenis: $('#jenis').val(), 
+                        merk: $('#merk').val(), 
+                        jumlah: $('#jumlah').val(), 
+
+
+                    }, 
+
+                    success: function(response){ 
+
+                      if(response.status == 200){
+                        Swal.fire(
+                          'Added!',
+                          'Data Barang Berhasil Ditambahkan',
+                          'success'
+                        )
+                          $('.alert-danger').hide(); 
+
+                          $('#exampleModal').modal('hide'); 
+                          $('.btn-close').click();
+                          readData();
+                            
+                          }
+                        else{
+                            $('.alert-danger').html(''); 
+
+                            $.each(response.errors, function(key, value){ 
+
+                                $('.alert-danger').show(); 
+
+                                $('.alert-danger').append('<li>'+value+'</li>'); 
+
+                            }); 
+
+                        } 
+                      }
+
+                      
+
+                      
+
+                    
+
+                }); 
+
+            }); 
+
+        }); 
+
+
 
   
 </script>

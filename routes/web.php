@@ -24,7 +24,8 @@ Auth::routes();
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
 Route::get('/barang', [BarangController::class, 'index'])->name('barang');
+Route::get('/read', [BarangController::class, 'read'])->name('read');
 Route::post('/barang/create', [BarangController::class, 'store'])->name('barang_store');
-Route::get('/barang/{barang}/edit', [BarangController::class, 'edit'])->name('edit/barang');
+Route::get('/barang/edit/{id}', [BarangController::class, 'edit'])->name('edit/barang');
 Route::put('/barang/{barang}', [BarangController::class, 'update'])->name('update/barang');
-Route::delete('/barang/{barang}', [BarangController::class, 'destroy'])->name('delete /barang');
+Route::delete('/barang/{barang}', [BarangController::class, 'destroy'])->name('delete/barang');
